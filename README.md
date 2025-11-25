@@ -52,10 +52,15 @@ Pronto! Agora você pode explorar o CineApp.
 Aqui estão algumas capturas de tela da aplicação em ação:
 
 **Tema Escuro**
-![Screenshot do tema escuro](./screenshots/tema-escuro.png)
+![Screenshot do tema claro]
+(C:\Users\denize\OneDrive\Desktop\imersão-dev-alura\screenshots\Screenshot_light.png)
+
+![Screenshot do tema claro]
+(C:\Users\denize\OneDrive\Desktop\imersão-dev-alura\screenshots\Screenshot_dark.png)
+
 
 **Modal de Detalhes**
-![Screenshot do modal de detalhes do filme](./screenshots/modal-detalhes.png)
+![Screenshot do modal de detalhes do filme](C:\Users\denize\OneDrive\Desktop\imersão-dev-alura\screenshots\Screenshot_modal.png)
 
 ## 📄 Licença
 
