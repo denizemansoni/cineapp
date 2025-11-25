@@ -1,4 +1,4 @@
-console.log("✅ script.js foi carregado e está sendo executado!");
+// console.log("✅ script.js foi carregado e está sendo executado!");
 
 document.addEventListener('DOMContentLoaded', () => {
     // --- ELEMENTOS DO DOM ---
@@ -114,7 +114,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     <div class="genres">
                         ${movie.genres.map(genre => `<span>${genre.name}</span>`).join('')}
                     </div>
-                    ${trailer ? `<a href="https://www.youtube.com/watch?v=${trailer.key}" target="_blank" class="trailer-button">Assistir Trailer</a>` : ''}
+                    ${trailer ? `
+                        <div class="trailer-container">
+                            <iframe src="https://www.youtube.com/embed/${trailer.key}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    ` : '<p>Trailer não disponível.</p>'}
                 </div>
             `;
             modal.style.display = 'flex';
