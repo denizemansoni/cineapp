@@ -75,7 +75,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const movieCard = document.createElement('div');
             movieCard.className = 'movie-card';
             movieCard.innerHTML = `
-                <img src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'placeholder.jpg'}" alt="${movie.title}">
+                <div class="image-container">
+                    <img src="${movie.poster_path ? 'https://image.tmdb.org/t/p/w500' + movie.poster_path : 'placeholder.jpg'}" alt="${movie.title}">
+                </div>
                 <div class="movie-info">
                     <h3>${movie.title}</h3>
                     <div class="rating">⭐ ${movie.vote_average.toFixed(1)}</div>
