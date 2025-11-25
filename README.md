@@ -53,14 +53,14 @@ Aqui estão algumas capturas de tela da aplicação em ação:
 
 **Tema Escuro**
 ![Screenshot do tema claro]
-(C:\Users\denize\OneDrive\Desktop\imersão-dev-alura\screenshots\Screenshot_light.png)
+(./screenshots/Screenshot_light.png)
 
 ![Screenshot do tema claro]
-(C:\Users\denize\OneDrive\Desktop\imersão-dev-alura\screenshots\Screenshot_dark.png)
+(./screenshots/Screenshot_dark.png)
 
 
 **Modal de Detalhes**
-![Screenshot do modal de detalhes do filme](C:\Users\denize\OneDrive\Desktop\imersão-dev-alura\screenshots\Screenshot_modal.png)
+![Screenshot do modal de detalhes do filme](./screenshots/Screenshot_modal.png)
 
 ## 📄 Licença
 
