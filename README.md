@@ -13,20 +13,18 @@ Bem-vindo ao Meu CineApp, uma aplicação web moderna e interativa para explorar
 - **Design Responsivo**: Interface elegante que se adapta a diferentes tamanhos de tela.
 - **Animações Suaves**: Efeitos de transição e fade-in que tornam a navegação mais agradável.
 
-## 🚀 Tecnologias Utilizadas
-
-## 🚀 Deploy
-
-A aplicação foi implantada na Vercel e pode ser acessada através do seguinte link:
-
-- **[Acessar CineApp](https://cineapp-kappa.vercel.app/)**
-
 - **HTML5**: Para a estrutura semântica da aplicação.
 - **CSS3**: Para estilização, design responsivo, animações e temas.
 - **JavaScript (ES6+)**: Para toda a lógica da aplicação, incluindo chamadas de API, manipulação do DOM e interatividade.
 - **The Movie Database (TMDb) API**: Para buscar informações detalhadas sobre os filmes.
 
-## 🔧 Como Usar
+##  Como Usar
+
+A aplicação foi implantada na Vercel e pode ser acessada através do seguinte link:
+
+- **[Acessar CineApp](https://cineapp-kappa.vercel.app/)**
+
+### Rodando Localmente
 
 Para rodar este projeto localmente, siga os passos abaixo:
 
