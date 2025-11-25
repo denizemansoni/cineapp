@@ -1,39 +1,51 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="description" content="Estaciona-Aí - Seu aplicativo confiável para encontrar vagas de estacionamento facilmente.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu CineApp</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" href="favicon.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <title>Estaciona-Aí</title>
 </head>
 <body>
     <header>
-        <a href="index.html" class="header-link"><img src="logo.png" alt="Logo Estaciona-Aí" class="logo"></a>
-        <a href="index.html" class="header-link"><h1>Estaciona-Aí</h1></a>
-        <button id="theme-toggle" class="theme-toggle-btn">🌙</button>
+        <div class="container">
+            <a href="#" id="home-link"><h1>Meu CineApp</h1></a>
+            <form id="search-form">
+                <input type="search" id="search-input" placeholder="Buscar filmes e séries...">
+            </form>
+            <div class="theme-switch-wrapper">
+                <label class="theme-switch" for="checkbox">
+                    <input type="checkbox" id="checkbox" />
+                    <div class="slider round"></div>
+                </label>
+            </div>
+        </div>
     </header>
 
-    <main>
-        <section>
-            <h2>Bem-vindo ao Estaciona-Aí!</h2>
-            <p>Seu aplicativo confiável para encontrar vagas de estacionamento facilmente.</p>
-            <br>
-            <a href="login.html" class="btn">Login / Cadastro</a>
-        </section>
+    <main class="container">
+        <nav class="category-tabs">
+            <button class="tab-button active" data-category="popular">Populares</button>
+            <button class="tab-button" data-category="top_rated">Mais Votados</button>
+            <button class="tab-button" data-category="favorites">Meus Favoritos</button>
+        </nav>
+        <h2 id="category-title">Filmes Populares</h2>
+        <div id="movies-container" class="movies-grid">
+            <!-- Os filmes serão inseridos aqui via JavaScript -->
+        </div>
     </main>
 
+    <!-- Modal para detalhes do filme (inicialmente oculto) -->
+    <div id="movie-modal" class="modal-overlay">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="modal-body">
+                <!-- Conteúdo do filme será inserido aqui via JavaScript -->
+            </div>
+        </div>
+    </div>
+
     <footer>
-        <p>&copy; 2025 Estaciona-Aí. Todos os direitos reservados.</p>
-        <ul>
-            <li><a href="#">Política de Privacidade</a></li>
-            <li><a href="#">Termos de Serviço</a></li>
-            <li><a href="#">Contato</a></li>
-        </ul>
+        <p>&copy; 2025 Meu CineApp. Todos os direitos reservados.</p>
     </footer>
 
     <script src="script.js"></script>

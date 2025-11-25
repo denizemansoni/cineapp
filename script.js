@@ -1,340 +1,272 @@
-// Função para alternar o tema
-const toggleTheme = () => {
-    const body = document.body;
-    const themeToggle = document.getElementById('theme-toggle');
-    let newTheme;
-
-    // Verifica o tema atual e alterna
-    if (body.getAttribute('data-theme') === 'dark') {
-        body.removeAttribute('data-theme');
-        newTheme = 'light';
-        themeToggle.textContent = '🌙'; // Ícone para ir para o modo escuro
-    } else {
-        body.setAttribute('data-theme', 'dark');
-        newTheme = 'dark';
-        themeToggle.textContent = '☀️'; // Ícone para ir para o modo claro
-    }
-
-    // Salva a preferência do usuário no localStorage
-    localStorage.setItem('theme', newTheme);
-};
-
-// Função para aplicar o tema salvo ao carregar a página
-const applySavedTheme = () => {
-    const savedTheme = localStorage.getItem('theme') || 'light'; // Padrão é 'light'
-    const body = document.body;
-    const themeToggle = document.getElementById('theme-toggle');
-
-    body.setAttribute('data-theme', savedTheme);
-    themeToggle.textContent = savedTheme === 'dark' ? '☀️' : '🌙';
-};
-
-// Função para lidar com o cadastro, agora enviando para o backend
-const handleRegistration = async (event) => {
-    event.preventDefault();
-
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-    const userType = document.querySelector('input[name="user_type"]:checked').value;
-
-    try {
-        const response = await fetch('http://localhost:3001/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, userType }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            alert(result.message); // "Usuário cadastrado com sucesso!"
-            // Redireciona para a página de login correta
-            window.location.href = userType === 'driver' ? 'login_motorista.html' : 'login_estabelecimento.html';
-        } else {
-            alert(`Erro: ${result.message}`);
-        }
-    } catch (error) {
-        console.error('Falha ao conectar com o servidor:', error);
-        alert('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
-    }
-};
-
-// Função para lidar com o login, validando no backend
-const handleLogin = async (event, userType) => {
-    event.preventDefault();
-
-    const email = document.getElementById('email').value;
-    const password = document.getElementById('password').value;
-
-    try {
-        const response = await fetch('http://localhost:3001/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, userType }),
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-            // Salva o "token" e os dados do usuário no localStorage para uso futuro
-            localStorage.setItem('authToken', result.token);
-            localStorage.setItem('userData', JSON.stringify(result.user));
-            
-            // Redireciona para o dashboard correto
-            window.location.href = userType === 'driver' ? 'dashboard_motorista.html' : 'dashboard_estabelecimento.html';
-        } else {
-            alert(`Erro de login: ${result.message}`);
-        }
-    } catch (error) {
-        console.error('Falha ao conectar com o servidor:', error);
-        alert('Não foi possível conectar ao servidor. Tente novamente mais tarde.');
-    }
-};
-
-// ==================================================================
-// INICIALIZADOR PRINCIPAL - Executado quando a página carrega
-// ==================================================================
 document.addEventListener('DOMContentLoaded', () => {
-    // Variável para guardar a instância do mapa Leaflet
-    let mapInstance = null;
+    // --- ELEMENTOS DO DOM ---
+    const moviesContainer = document.getElementById('movies-container');
+    const themeToggle = document.getElementById('checkbox'); // Assumindo que o checkbox é o seu toggle
+    const searchInput = document.getElementById('search-input');
+    const body = document.body;
+    const homeLink = document.getElementById('home-link');
+    const modal = document.getElementById('movie-modal');
+    const modalBody = document.getElementById('modal-body');
+    const closeButton = document.querySelector('.close-button');
+    const categoryTabs = document.querySelector('.category-tabs');
+    const categoryTitle = document.getElementById('category-title');
 
-    // 1. Configura o tema (claro/escuro) em todas as páginas
-    const themeToggle = document.getElementById('theme-toggle');
-    themeToggle.addEventListener('click', toggleTheme);
-    applySavedTheme();
-    
-    // Adicionado: Exibe a saudação ao usuário
-    displayUserGreeting();
-
-    // 2. Configura o botão de logout
-    const logoutButton = document.querySelector('.btn-logout');
-    if (logoutButton) {
-        logoutButton.addEventListener('click', handleLogout);
-    }
-    
-    const registrationForm = document.getElementById('registration-form');
-    if (registrationForm) {
-        registrationForm.addEventListener('submit', handleRegistration);
-    }
-
-    const driverLoginForm = document.getElementById('driver-login-form');
-    if (driverLoginForm) {
-        driverLoginForm.addEventListener('submit', (event) => handleLogin(event, 'driver'));
-    }
-
-    const establishmentLoginForm = document.getElementById('establishment-login-form');
-    if (establishmentLoginForm) {
-        // Passamos 'establishment' para a função de login saber qual tipo de usuário é
-        establishmentLoginForm.addEventListener('submit', (event) => handleLogin(event, 'establishment'));
-    }
-
-    // 3. Se existir um elemento com id="map", inicializa o mapa
-    // Isso garante que o código do mapa só rode na página do dashboard do motorista
-    if (document.getElementById('map')) {
-        mapInstance = initLeafletMap();
-
-        // 4. Adiciona o listener para o botão de busca de endereço
-        const searchButton = document.getElementById('search-button');
-        if (searchButton) {
-            searchButton.addEventListener('click', () => handleAddressSearch(mapInstance));
+    // --- LÓGICA PARA TROCA DE TEMA ---
+    function applyTheme(theme) {
+        if (theme === 'dark-mode') {
+            body.classList.add('dark-mode');
+            themeToggle.checked = true; // No tema escuro, o toggle está "ligado"
+        } else { // Tema claro
+            body.classList.remove('dark-mode');
+            themeToggle.checked = false; // No tema claro, o toggle está "desligado"
         }
-
-        // 5. Carrega os marcadores de estacionamento do backend
-        loadParkingMarkers(mapInstance);
     }
 
-    // 6. Se estiver no dashboard do estabelecimento, carrega os dados
-    const managementForm = document.getElementById('management-form');
-    if (managementForm) {
-        loadEstablishmentData();
-        managementForm.addEventListener('submit', handleUpdateParkingData);
-    }
-});
-
-// Função para fazer logout
-const handleLogout = (event) => {
-    event.preventDefault(); // Previne o redirecionamento padrão do link
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('userData');
-    window.location.href = 'index.html'; // Redireciona para a página inicial
-};
-
-// Função para exibir o nome do usuário logado
-const displayUserGreeting = () => {
-    const userDataString = localStorage.getItem('userData');
-    const greetingElement = document.getElementById('user-greeting');
-
-    // Se o elemento de saudação e os dados do usuário existirem...
-    if (greetingElement && userDataString) {
-        const userData = JSON.parse(userDataString);
-        // Pega apenas o primeiro nome para manter o cabeçalho limpo
-        const firstName = userData.name.split(' ')[0];
-        greetingElement.textContent = `Olá, ${firstName}!`;
-    }
-};
-
-/*
-  ==============================================
-  FUNÇÕES DO DASHBOARD (MAPA COM LEAFLET)
-  ==============================================
-*/
-
-// Variável para guardar a instância do mapa, acessível por outras funções
-let map;
-
-// Variável para guardar os marcadores e poder atualizá-los
-let parkingMarkers = [];
-
-// Função para inicializar o mapa com Leaflet.js e OpenStreetMap
-function initLeafletMap() {
-    // Coordenadas iniciais do mapa (Ex: Centro de São Paulo)
-    const initialLocation = { lat: -23.55052, lng: -46.633308 };
-
-    // 1. Cria o objeto do mapa na div com id="map"
-    // .setView([latitude, longitude], zoomLevel)
-    map = L.map('map').setView([initialLocation.lat, initialLocation.lng], 14);
-
-    // 2. Adiciona a camada de "tiles" (as imagens do mapa) do OpenStreetMap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        // Atribuição é obrigatória para o OpenStreetMap
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    }).addTo(map);
-
-    // 3. Adiciona um marcador (pin) no mapa
-    L.marker([initialLocation.lat, initialLocation.lng]).addTo(map)
-        .bindPopup('Centro de São Paulo.<br> Ponto inicial.') // Mensagem que aparece ao clicar
-        .openPopup(); // Abre o popup por padrão
-    
-    return map; // Retorna a instância do mapa para ser usada por outras funções
-}
-
-// Função para carregar os estacionamentos do backend e adicioná-los ao mapa
-async function loadParkingMarkers(map) {
-    try {
-        const response = await fetch('http://localhost:3001/api/parkings');
-        const parkings = await response.json();
-
-        if (response.ok) {
-            // Limpa marcadores antigos antes de adicionar novos
-            parkingMarkers.forEach(marker => marker.remove());
-            parkingMarkers = [];
-
-            parkings.forEach(parking => {
-                // Cria o conteúdo do popup com as informações do estacionamento
-                const popupContent = `
-                    <strong>${parking.name}</strong><br>
-                    Vagas disponíveis: ${parking.availableSpots} / ${parking.totalSpots}<br>
-                    <button class="btn btn-small" onclick="handleReservation(${parking.id})" style="margin-top: 10px; width: 100%;">Reservar</button>
-                `;
-
-                // Adiciona o marcador no mapa
-                const marker = L.marker([parking.lat, parking.lon])
-                    .addTo(map)
-                    .bindPopup(popupContent);
-                
-                // Guarda o marcador para referência futura
-                parkingMarkers.push(marker);
-            });
-        }
-    } catch (error) {
-        console.error('Erro ao carregar os estacionamentos:', error);
-        alert('Não foi possível carregar os pontos de estacionamento.');
-    }
-}
-
-// Função para lidar com o clique no botão "Reservar"
-async function handleReservation(parkingId) {
-    try {
-        const response = await fetch('http://localhost:3001/api/reserve', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ parkingId }),
-        });
-
-        const result = await response.json();
-        alert(result.message);
-
-        if (response.ok) {
-            // Se a reserva foi bem-sucedida, fecha todos os popups
-            map.closePopup();
-            // E recarrega os marcadores para mostrar a contagem de vagas atualizada
-            loadParkingMarkers(map);
-        }
-
-    } catch (error) {
-        console.error('Erro ao fazer a reserva:', error);
-        alert('Não foi possível conectar ao servidor para fazer a reserva.');
-    }
-}
-
-// Função para buscar o endereço e centralizar o mapa
-async function handleAddressSearch() {
-    const addressInput = document.getElementById('search-address');
-    const address = addressInput.value;
-
-    if (!address) {
-        alert('Por favor, digite um endereço para buscar.');
-        return;
+    // Verifica e aplica o tema salvo no localStorage ao carregar a página
+    const currentTheme = localStorage.getItem('theme');
+    if (currentTheme) {
+        applyTheme(currentTheme);
     }
 
-    try {
-        const response = await fetch(`http://localhost:3001/api/geocode?address=${encodeURIComponent(address)}`);
-        const result = await response.json();
-
-        if (response.ok) {
-            const { lat, lon } = result;
-            // Centraliza o mapa nas novas coordenadas com um zoom mais próximo
-            map.setView([lat, lon], 16);
-            // Adiciona um novo marcador no local encontrado
-            L.marker([lat, lon]).addTo(map).bindPopup(address).openPopup();
-        } else {
-            alert(`Erro: ${result.message}`);
-        }
-    } catch (error) {
-        console.error('Erro ao buscar endereço:', error);
-        alert('Não foi possível conectar ao servidor para buscar o endereço.');
-    }
-}
-
-/*
-  ==============================================
-  FUNÇÕES DO DASHBOARD DO ESTABELECIMENTO
-  ==============================================
-*/
-
-// Função para carregar os dados do estacionamento no formulário
-async function loadEstablishmentData() {
-    try {
-        const response = await fetch('http://localhost:3001/api/my-parking');
-        const data = await response.json();
-
-        if (response.ok) {
-            document.getElementById('total-spots').value = data.totalSpots;
-            document.getElementById('available-spots').value = data.availableSpots;
-            // Aqui você também preencheria os campos de preço, se eles estivessem no backend
-        } else {
-            alert(`Erro: ${data.message}`);
-        }
-    } catch (error) {
-        console.error('Erro ao carregar dados do estabelecimento:', error);
-        alert('Não foi possível carregar os dados do seu estacionamento.');
-    }
-}
-
-// Função para salvar as alterações no formulário de gerenciamento
-async function handleUpdateParkingData(event) {
-    event.preventDefault();
-
-    const totalSpots = document.getElementById('total-spots').value;
-    const availableSpots = document.getElementById('available-spots').value;
-
-    const response = await fetch('http://localhost:3001/api/my-parking', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ totalSpots, availableSpots }),
+    // Listener para a troca de tema
+    themeToggle.addEventListener('change', () => {
+        const newTheme = themeToggle.checked ? 'dark-mode' : 'light';
+        localStorage.setItem('theme', newTheme);
+        applyTheme(newTheme);
     });
 
-    const result = await response.json();
-    alert(result.message);
-}
+    // --- LÓGICA PARA BUSCA E EXIBIÇÃO DE FILMES ---
+    let allMovies = []; // Array para armazenar todos os filmes buscados da API
+    let favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Carrega os favoritos
+    let currentCategory = 'popular'; // Categoria inicial
+
+    // Chave da API do TMDb
+    let apiKey = localStorage.getItem('tmdbApiKey');
+    const baseApiUrl = 'https://api.themoviedb.org/3/movie/';
+
+    // Função para verificar e solicitar a chave da API se não existir
+    function initializeApiKey() {
+        if (!apiKey) {
+            apiKey = prompt("Bem-vindo ao CineApp! Por favor, insira sua chave da API do TMDb para carregar os filmes.");
+            if (apiKey && apiKey.trim() !== '') {
+                localStorage.setItem('tmdbApiKey', apiKey);
+            } else {
+                moviesContainer.innerHTML = '<p>Uma chave de API do TMDb é necessária. Por favor, recarregue a página e insira sua chave.</p>';
+                // Impede a execução do resto do código se a chave não for fornecida
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // Função para buscar os filmes da API com base na categoria
+    async function fetchMovies(category = 'popular') {
+        // Se a categoria for 'favorites', não busca na API
+        if (category === 'favorites') {
+            const favoriteMovies = allMovies.filter(movie => favorites.includes(movie.id));
+            displayMovies(favoriteMovies);
+            updateCategoryTitle('Meus Favoritos');
+            return;
+        }
+
+        const apiUrl = `${baseApiUrl}${category}?api_key=${apiKey}&language=pt-BR`;
+        try {
+            const response = await fetch(apiUrl);
+            const data = await response.json();
+            
+            // Atualiza a lista `allMovies` apenas se for a busca principal (popular)
+            // para garantir que a lista de favoritos funcione corretamente.
+            if (category === 'popular') {
+                allMovies = data.results;
+            }
+
+            displayMovies(data.results);
+            updateCategoryTitle(category === 'popular' ? 'Filmes Populares' : 'Filmes Mais Votados');
+
+        } catch (error) {
+            console.error('Erro ao buscar filmes:', error);
+            moviesContainer.innerHTML = '<p>Não foi possível carregar os filmes. Tente novamente mais tarde.</p>';
+        }
+    }
+
+    // Função para criar os cards dos filmes e exibi-los na tela
+    function displayMovies(movies) {
+        moviesContainer.innerHTML = ''; // Limpa o container antes de adicionar novos filmes
+
+        if (movies.length === 0 && currentCategory === 'favorites') {
+            moviesContainer.innerHTML = '<p class="no-results">Você ainda não adicionou nenhum filme aos favoritos.</p>';
+            return;
+        } else if (movies.length === 0) {
+            moviesContainer.innerHTML = '<p class="no-results">Nenhum filme encontrado. Tente buscar por outro termo.</p>';
+            return; // Encerra a função aqui se não houver filmes
+        }
+
+        movies.forEach(movie => {
+            const movieCard = document.createElement('div');
+            movieCard.classList.add('movie-card');
+
+            const isFavorite = favorites.includes(movie.id);
+
+            movieCard.innerHTML = `
+                <span class="favorite-icon ${isFavorite ? 'active' : ''}" data-movie-id="${movie.id}">&#x2665;</span>
+                <div class="image-container">
+                    <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="Pôster do filme ${movie.title}">
+                </div>
+                 <div class="movie-info">
+                     <h3>${movie.title}</h3>
+                     <p>Nota: ${movie.vote_average.toFixed(1)}</p>
+                 </div>
+            `;
+
+            // Adiciona o evento de clique para abrir o modal com os detalhes do filme
+            movieCard.querySelector('.image-container').addEventListener('click', () => showMovieDetails(movie));
+            movieCard.querySelector('.movie-info').addEventListener('click', () => showMovieDetails(movie));
+
+            // Adiciona o evento de clique para o ícone de favorito
+            const favoriteIcon = movieCard.querySelector('.favorite-icon');
+            favoriteIcon.addEventListener('click', (event) => {
+                event.stopPropagation(); // Impede que o modal abra ao clicar no ícone
+                toggleFavorite(movie.id, favoriteIcon);
+            });
+
+            moviesContainer.appendChild(movieCard);
+        });
+    }
+
+    // Listener para o campo de busca
+    searchInput.addEventListener('keyup', (event) => {
+        const searchTerm = event.target.value.toLowerCase();
+
+        // Filtra a lista de filmes já carregada (allMovies)
+        const filteredMovies = allMovies.filter(movie => {
+            return movie.title.toLowerCase().includes(searchTerm);
+        });
+
+        displayMovies(filteredMovies);
+    });
+
+    // Função para atualizar o título da categoria
+    function updateCategoryTitle(title) {
+        categoryTitle.textContent = title;
+    }
+
+    // --- LÓGICA DO MENU PRINCIPAL E MODAL ---
+
+    // Função para salvar favoritos no localStorage
+    function saveFavorites() {
+        localStorage.setItem('favorites', JSON.stringify(favorites));
+    }
+
+    // Função para adicionar/remover um filme dos favoritos
+    function toggleFavorite(movieId, iconElement) {
+        const movieIndex = favorites.indexOf(movieId);
+
+        if (movieIndex > -1) {
+            // Remove dos favoritos
+            favorites.splice(movieIndex, 1);
+            iconElement.classList.remove('active');
+        } else {
+            // Adiciona aos favoritos
+            favorites.push(movieId);
+            iconElement.classList.add('active');
+        }
+
+        saveFavorites();
+
+        // Se estiver na aba de favoritos, atualiza a visualização em tempo real
+        if (currentCategory === 'favorites') {
+            const favoriteMovies = allMovies.filter(movie => favorites.includes(movie.id));
+            displayMovies(favoriteMovies);
+        }
+    }
+
+    // Função para buscar os vídeos de um filme
+    async function fetchMovieVideos(movieId) {
+        try {
+            const videoApiUrl = `https://api.themoviedb.org/3/movie/${movieId}/videos?api_key=${apiKey}&language=pt-BR`;
+            const response = await fetch(videoApiUrl);
+            const data = await response.json();
+            // Procura por um trailer oficial do YouTube
+            const trailer = data.results.find(video => video.site === 'YouTube' && video.type === 'Trailer');
+            return trailer ? trailer.key : null;
+        } catch (error) {
+            console.error('Erro ao buscar vídeos do filme:', error);
+            return null;
+        }
+    }
+
+    // Função para exibir os detalhes do filme no modal
+    async function showMovieDetails(movie) {
+        modal.style.display = 'flex'; // Mostra o modal imediatamente
+        modalBody.innerHTML = '<p>Carregando detalhes e trailer...</p>'; // Feedback de carregamento
+
+        const trailerKey = await fetchMovieVideos(movie.id);
+        let trailerHtml = '';
+
+        if (trailerKey) {
+            trailerHtml = `
+                <div class="trailer-container">
+                    <iframe src="https://www.youtube.com/embed/${trailerKey}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                </div>
+            `;
+        } else {
+            trailerHtml = '<p>Trailer não disponível.</p>';
+        }
+
+        modalBody.innerHTML = `
+            <div class="modal-details">
+                <img src="https://image.tmdb.org/t/p/w500${movie.poster_path}" alt="Pôster do filme ${movie.title}">
+                <div>
+                    <h2>${movie.title}</h2>
+                    <p><strong>Resumo:</strong> ${movie.overview || 'Resumo não disponível.'}</p>
+                    <p><strong>Nota:</strong> ${movie.vote_average.toFixed(1)}</p>
+                    <p><strong>Data de Lançamento:</strong> ${new Date(movie.release_date).toLocaleDateString('pt-BR')}</p>
+                </div>
+            </div>
+            ${trailerHtml}
+        `;
+    }
+
+    // Função para fechar o modal
+    function closeModal() {
+        modal.style.display = 'none';
+        modalBody.innerHTML = ''; // Limpa o conteúdo do modal para parar o vídeo
+    }
+
+    // Evento para o botão de fechar do modal
+    closeButton.addEventListener('click', closeModal);
+
+    // Evento para fechar o modal clicando fora dele
+    modal.addEventListener('click', (event) => {
+        if (event.target === modal) {
+            closeModal();
+        }
+    });
+
+    // Evento para o link "Home" que recarrega os filmes populares
+    homeLink.addEventListener('click', (event) => {
+        event.preventDefault(); // Impede que a página recarregue
+        searchInput.value = ''; // Limpa o campo de busca
+        currentCategory = 'popular';
+        fetchMovies(currentCategory); // Busca e exibe os filmes populares novamente
+        // Atualiza a aba ativa visualmente
+        document.querySelector('.tab-button.active').classList.remove('active');
+        document.querySelector('.tab-button[data-category="popular"]').classList.add('active');
+    });
+
+    // Evento para a navegação por abas
+    categoryTabs.addEventListener('click', (event) => {
+        if (event.target.classList.contains('tab-button')) {
+            document.querySelector('.tab-button.active').classList.remove('active');
+            event.target.classList.add('active');
+            currentCategory = event.target.dataset.category;
+            fetchMovies(currentCategory);
+        }
+    });
+
+    // --- INICIALIZAÇÃO ---
+    // Verifica a chave da API e, se for válida, carrega os filmes
+    if (initializeApiKey()) {
+        fetchMovies(currentCategory);
+    }
+});
