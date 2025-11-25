@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModalButton = document.querySelector('.close-button');
     const themeToggle = document.getElementById('checkbox');
     const homeLink = document.getElementById('home-link');
+    const loader = document.getElementById('loader-overlay');
 
     // --- ESTADO DA APLICAÇÃO ---
     let favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Carrega os favoritos
@@ -23,11 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
     // Função para buscar os filmes da API com base na categoria
     async function fetchMovies(category = 'popular') {
         try {
-            moviesContainer.innerHTML = '<p>Carregando filmes...</p>';
+            loader.style.display = 'flex'; // Mostra o spinner
+            moviesContainer.innerHTML = ''; // Limpa o container de filmes
+
             // Construir a URL da API
             let url; // URL para o nosso proxy
 
             if (category === 'favorites') {
+                // Mesmo para favoritos, simulamos um pequeno delay para a UI parecer consistente
+                // e o spinner não piscar rápido demais.
+                await new Promise(resolve => setTimeout(resolve, 200));
                 displayMovies(favorites);
                 return;
             }
@@ -59,6 +65,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (error) {
             console.error('Erro ao buscar filmes:', error);
             moviesContainer.innerHTML = '<p class="error-message">Não foi possível carregar os filmes. Tente novamente mais tarde.</p>';
+        } finally {
+            loader.style.display = 'none'; // Esconde o spinner
         }
     }
 

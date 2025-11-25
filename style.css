@@ -32,6 +32,11 @@ body {
     margin: 0 auto;
     padding: 20px;
 }
+main.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
 
 header {
     background: var(--header-background);
@@ -86,6 +91,23 @@ h1 {
     border-color: var(--gradient-start); /* Usa a cor do degradê no foco */
     box-shadow: 0 0 10px rgba(255, 0, 204, 0.4); /* Adiciona um brilho sutil */
     width: 350px; /* Aumenta a largura ao focar */
+}
+
+/* Estilos para o botão de busca */
+#search-button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background-image: linear-gradient(45deg, var(--gradient-start), var(--gradient-end));
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#search-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(255, 0, 204, 0.5);
 }
 
 /* Estilos para as Abas de Categoria */
@@ -397,6 +419,47 @@ input:checked + .slider:before {
     left: 0;
     width: 100%;
     height: 100%;
+}
+
+/* Estilos para o Spinner de Carregamento */
+.loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--background-color-rgb, 255, 255, 255), 0.7); /* Usa RGB para transparência */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1500;
+    display: none; /* Começa oculto */
+}
+
+body.dark-theme .loader-overlay {
+    background: rgba(34, 34, 34, 0.7); /* Fundo para o tema escuro */
+}
+
+.loader {
+    border: 8px solid var(--card-background);
+    border-top: 8px solid var(--gradient-start);
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+main.container {
+    position: relative; /* Necessário para o posicionamento absoluto do overlay */
 }
 
 /* Animação para o modal aparecer */

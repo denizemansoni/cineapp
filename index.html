@@ -12,6 +12,7 @@
             <a href="#" id="home-link"><h1>Meu CineApp</h1></a>
             <form id="search-form">
                 <input type="search" id="search-input" placeholder="Buscar filmes e séries...">
+                <button type="submit" id="search-button">Buscar</button>
             </form>
             <div class="theme-switch-wrapper">
                 <label class="theme-switch" for="checkbox">
@@ -29,6 +30,12 @@
             <button class="tab-button" data-category="favorites">Meus Favoritos</button>
         </nav>
         <h2 id="category-title">Filmes Populares</h2>
+
+        <!-- Overlay de Carregamento com Spinner -->
+        <div id="loader-overlay" class="loader-overlay">
+            <div class="loader"></div>
+        </div>
+
         <div id="movies-container" class="movies-grid">
             <!-- Os filmes serão inseridos aqui via JavaScript -->
         </div>
