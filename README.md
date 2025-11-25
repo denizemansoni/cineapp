@@ -49,15 +49,11 @@ Pronto! Agora você pode explorar o CineApp.
 
 ## 📸 Screenshots
 
-Aqui estão algumas capturas de tela da aplicação em ação:
+**Tema Claro**
+![Screenshot do tema claro](./screenshots/Screenshot_light.png)
 
 **Tema Escuro**
-![Screenshot do tema claro]
-(./screenshots/Screenshot_light.png)
-
-![Screenshot do tema claro]
-(./screenshots/Screenshot_dark.png)
-
+![Screenshot do tema escuro](./screenshots/Screenshot_dark.png)
 
 **Modal de Detalhes**
 ![Screenshot do modal de detalhes do filme](./screenshots/Screenshot_modal.png)
