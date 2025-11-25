@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('checkbox');
     const homeLink = document.getElementById('home-link');
     const loader = document.getElementById('loader-overlay');
+    const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
 
     // --- ESTADO DA APLICAÇÃO ---
     let favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Carrega os favoritos
@@ -296,6 +297,20 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     window.addEventListener('scroll', handleInfiniteScroll);
+
+    // Botão Voltar ao Topo
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 400) {
+            scrollToTopBtn.classList.add('show');
+        } else {
+            scrollToTopBtn.classList.remove('show');
+        }
+    });
+
+    scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
 
     // --- INICIALIZAÇÃO ---
     // Carrega o tema salvo
