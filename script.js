@@ -15,24 +15,15 @@ document.addEventListener('DOMContentLoaded', () => {
     let favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Carrega os favoritos
     let currentCategory = 'popular'; // Categoria inicial
 
-    // A chave da API será injetada pela Vercel. Veja o arquivo vercel.json.
-    const apiKey = '%VITE_API_KEY%';
-    const baseApiUrl = 'https://api.themoviedb.org/3/movie/';
+    // Usaremos o endpoint de proxy da Vercel para a API do TMDb
+    const proxyApiUrl = '/api/tmdb';
 
     // Função para buscar os filmes da API com base na categoria
     async function fetchMovies(category = 'popular') {
         try {
             moviesContainer.innerHTML = '<p>Carregando filmes...</p>';
             // Construir a URL da API
-            let url;
-
-            // DEBUG: Log da chave da API para verificar se está sendo injetada corretamente
-            // console.log('API Key sendo usada (primeiros 5 caracteres):', apiKey ? apiKey.substring(0, 5) + '...' : 'Não definida ou não injetada');
-            if (!apiKey || apiKey.startsWith('%VITE_')) { 
-                console.error('ERRO: Chave da API ausente ou não injetada corretamente!'); 
-                moviesContainer.innerHTML = '<p class="error-message">Não foi possível carregar os filmes. A configuração da API falhou.</p>';
-                return;
-            }
+            let url; // URL para o nosso proxy
 
             if (category === 'favorites') {
                 displayMovies(favorites);
@@ -45,10 +36,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     fetchMovies(currentCategory); // Volta para a categoria atual se a busca estiver vazia
                     return;
                 }
-                url = `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${query}&language=pt-BR`;
+                url = `${proxyApiUrl}?endpoint=search/movie&query=${query}&language=pt-BR`;
                 categoryTitle.textContent = `Resultados para: "${query}"`;
             } else {
-                url = `${baseApiUrl}${category}?api_key=${apiKey}&language=pt-BR`;
+                url = `${proxyApiUrl}?endpoint=movie/${category}&language=pt-BR`;
                 updateCategoryTitle(category);
             }
 
@@ -102,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Função para abrir o modal com detalhes do filme
     async function openModal(movieId) {
         try {
-            const response = await fetch(`${baseApiUrl}${movieId}?api_key=${apiKey}&language=pt-BR&append_to_response=videos`);
+            const response = await fetch(`${proxyApiUrl}?endpoint=movie/${movieId}&language=pt-BR&append_to_response=videos`);
             if (!response.ok) throw new Error('Falha ao buscar detalhes do filme.');
             const movie = await response.json();
 

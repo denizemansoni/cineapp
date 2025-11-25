@@ -13,7 +13,7 @@
  */
 export default async function handler(request, response) {
   const { endpoint, ...queryParams } = request.query;
-  const apiKey = process.env.TMDB_API_KEY; // A chave é lida da variável de ambiente
+  const apiKey = process.env.API_KEY; // A chave é lida da variável de ambiente
 
   if (!apiKey) {
     return response.status(500).json({ error: 'A chave da API não está configurada no servidor.' });
