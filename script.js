@@ -45,7 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const response = await fetch(url);
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                // Tenta ler a mensagem de erro do corpo da resposta da API
+                const errorData = await response.json().catch(() => null);
+                const errorMessage = errorData?.error || `HTTP error! status: ${response.status}`;
+                // Lança um erro com a mensagem detalhada
+                throw new Error(errorMessage);
             }
             const data = await response.json();
             displayMovies(data.results);
