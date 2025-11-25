@@ -1,6 +1,6 @@
-# 🎬 Meu CineApp
+# 🎬 CineApp
 
-Bem-vindo ao Meu CineApp, uma aplicação web moderna e interativa para explorar filmes populares, mais votados e salvar seus favoritos! Este projeto foi construído com HTML, CSS e JavaScript puros, utilizando a API do The Movie Database (TMDb) para obter dados de filmes em tempo real.
+Bem-vindo ao CineApp, uma aplicação web moderna e interativa para explorar filmes populares, mais votados e salvar seus favoritos! Este projeto foi construído com HTML, CSS e JavaScript puros, utilizando a API do The Movie Database (TMDb) para obter dados de filmes em tempo real.
 
 ## ✨ Features
 
