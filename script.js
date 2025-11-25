@@ -1,3 +1,5 @@
+console.log("✅ script.js foi carregado e está sendo executado!");
+
 document.addEventListener('DOMContentLoaded', () => {
     // --- ELEMENTOS DO DOM ---
     const moviesContainer = document.getElementById('movies-container');
