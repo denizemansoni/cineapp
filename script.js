@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentCategory = 'popular'; // Categoria inicial
 
     // Chave da API do TMDb
-    let apiKey = localStorage.getItem('tmdbApiKey');
+    let apiKey = 'f5faae7b3014134fbd0051d42204b99dc'; // Chave da API do TMDb
     const baseApiUrl = 'https://api.themoviedb.org/3/movie/';
 
     // Função para verificar e solicitar a chave da API se não existir
