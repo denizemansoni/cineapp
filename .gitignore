@@ -1,0 +1,11 @@
+# Arquivo de variáveis de ambiente
+# NUNCA envie este arquivo para o repositório!
+.env
+
+# Arquivos de sistema operacional
+.DS_Store
+Thumbs.db
+
+# Pasta de configuração de editores
+.vscode/
+.idea/

@@ -15,6 +15,12 @@ Bem-vindo ao Meu CineApp, uma aplicação web moderna e interativa para explorar
 
 ## 🚀 Tecnologias Utilizadas
 
+## 🚀 Deploy
+
+A aplicação foi implantada na Vercel e pode ser acessada através do seguinte link:
+
+- **[Acessar CineApp](https://cineapp-kappa.vercel.app/)**
+
 - **HTML5**: Para a estrutura semântica da aplicação.
 - **CSS3**: Para estilização, design responsivo, animações e temas.
 - **JavaScript (ES6+)**: Para toda a lógica da aplicação, incluindo chamadas de API, manipulação do DOM e interatividade.
@@ -35,15 +41,16 @@ Para rodar este projeto localmente, siga os passos abaixo:
     - Copie a sua chave da API (v3 auth).
 
 3.  **Adicione a chave da API ao projeto:**
-    - Abra o arquivo `script.js`.
-    - Encontre a linha que diz:
-      ```javascript
-      const apiKey = 'SUA_CHAVE_DA_API_AQUI'; 
+    - Na raiz do projeto, crie um arquivo chamado `.env`.
+    - Dentro do arquivo `.env`, adicione a seguinte linha, substituindo `SUA_CHAVE_DA_API_AQUI` pela chave que você obteve:
       ```
-    - Substitua `'SUA_CHAVE_DA_API_AQUI'` pela chave que você copiou.
+      API_KEY=SUA_CHAVE_DA_API_AQUI
+      ```
+    - **Importante**: Certifique-se de que o arquivo `.env` esteja no seu `.gitignore` para que sua chave de API não seja enviada para o GitHub. Se o arquivo `.gitignore` não existir, crie-o e adicione `.env` a ele.
 
 4.  **Abra no navegador:**
     - Navegue até a pasta do projeto e abra o arquivo `index.html` no seu navegador de preferência.
+    - Para que o projeto funcione localmente com o arquivo `.env`, você precisará de um servidor de desenvolvimento que carregue essas variáveis. Uma forma simples é usar a extensão **Live Server** no VS Code.
 
 Pronto! Agora você pode explorar o CineApp.
 
