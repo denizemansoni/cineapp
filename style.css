@@ -492,3 +492,11 @@ main.container {
     width: 100%;
     height: 100%;
 }
+
+/* Estilos para o loader de rolagem infinita */
+.infinite-scroll-loader {
+    display: none; /* Começa oculto */
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}

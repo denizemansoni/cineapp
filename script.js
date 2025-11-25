@@ -16,16 +16,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- ESTADO DA APLICAÇÃO ---
     let favorites = JSON.parse(localStorage.getItem('favorites')) || []; // Carrega os favoritos
-    let currentCategory = 'popular'; // Categoria inicial
+    let currentCategory = 'popular'; // Categoria inicial.
+    let currentPage = 1; // Página atual para a paginação.
+    let isLoadingMore = false; // Flag para evitar múltiplas requisições.
+    let currentQuery = ''; // Armazena a busca atual para paginação.
 
     // Usaremos o endpoint de proxy da Vercel para a API do TMDb
     const proxyApiUrl = '/api/tmdb';
 
     // Função para buscar os filmes da API com base na categoria
     async function fetchMovies(category = 'popular') {
+        currentPage = 1; // Reseta para a primeira página sempre que uma nova categoria é buscada.
+        moviesContainer.innerHTML = ''; // Limpa o container para a nova busca.
+
         try {
             loader.style.display = 'flex'; // Mostra o spinner
-            moviesContainer.innerHTML = ''; // Limpa o container de filmes
 
             // Construir a URL da API
             let url; // URL para o nosso proxy
@@ -39,14 +44,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (category === 'search') {
-                const query = searchInput.value.trim();
-                if (!query) {
+                currentQuery = searchInput.value.trim();
+                if (!currentQuery) {
                     fetchMovies(currentCategory); // Volta para a categoria atual se a busca estiver vazia
                     return;
                 }
-                url = `${proxyApiUrl}?endpoint=search/movie&query=${query}&language=pt-BR`;
-                categoryTitle.textContent = `Resultados para: "${query}"`;
+                url = `${proxyApiUrl}?endpoint=search/movie&query=${currentQuery}&page=${currentPage}&language=pt-BR`;
+                categoryTitle.textContent = `Resultados para: "${currentQuery}"`;
             } else {
+                currentQuery = ''; // Limpa a query de busca se não for uma busca.
                 url = `${proxyApiUrl}?endpoint=movie/${category}&language=pt-BR`;
                 updateCategoryTitle(category);
             }
@@ -71,10 +77,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Função para exibir os filmes na tela
-    function displayMovies(movies) {
-        moviesContainer.innerHTML = ''; // Limpa o container
+    function displayMovies(movies, append = false) {
+        if (!append) moviesContainer.innerHTML = ''; // Limpa o container apenas se não for para adicionar
+
         if (!movies || movies.length === 0) {
-            moviesContainer.innerHTML = `<p>Nenhum filme encontrado.</p>`;
+            if (!append) moviesContainer.innerHTML = `<p>Nenhum filme encontrado.</p>`;
             return;
         }
 
@@ -104,6 +111,42 @@ document.addEventListener('DOMContentLoaded', () => {
             moviesContainer.appendChild(movieCard);
         });
     }
+
+    // Função para buscar mais filmes (paginação)
+    async function fetchMoreMovies() {
+        if (isLoadingMore || currentCategory === 'favorites') return; // Não carrega mais se já estiver carregando ou na aba de favoritos.
+
+        isLoadingMore = true;
+        document.getElementById('infinite-scroll-loader').style.display = 'block'; // Mostra o loader de rolagem
+        currentPage++;
+
+        let url;
+        if (currentQuery) { // Se houver uma busca ativa
+            url = `${proxyApiUrl}?endpoint=search/movie&query=${currentQuery}&page=${currentPage}&language=pt-BR`;
+        } else { // Se for uma categoria normal
+            url = `${proxyApiUrl}?endpoint=movie/${currentCategory}&page=${currentPage}&language=pt-BR`;
+        }
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            if (data.results && data.results.length > 0) {
+                displayMovies(data.results, true); // Adiciona os novos filmes à lista existente
+            } else {
+                // Se não houver mais resultados, desativa a rolagem infinita para esta sessão
+                window.removeEventListener('scroll', handleInfiniteScroll);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar mais filmes:', error);
+        } finally {
+            isLoadingMore = false;
+            document.getElementById('infinite-scroll-loader').style.display = 'none'; // Esconde o loader de rolagem
+        }
+    }
+
 
     // --- MODAL ---
     // Função para abrir o modal com detalhes do filme
@@ -218,6 +261,7 @@ document.addEventListener('DOMContentLoaded', () => {
             currentCategory = tab.dataset.category;
             searchInput.value = ''; // Limpa a busca ao trocar de aba
             fetchMovies(currentCategory);
+            window.addEventListener('scroll', handleInfiniteScroll); // Reativa o scroll listener ao trocar de aba
         });
     });
 
@@ -242,6 +286,16 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.setItem('darkTheme', themeToggle.checked);
         applyTheme(themeToggle.checked);
     });
+
+    // Rolagem Infinita
+    const handleInfiniteScroll = () => {
+        // Se o usuário rolou até perto do final da página
+        if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+            fetchMoreMovies();
+        }
+    };
+
+    window.addEventListener('scroll', handleInfiniteScroll);
 
     // --- INICIALIZAÇÃO ---
     // Carrega o tema salvo
