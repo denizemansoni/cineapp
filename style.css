@@ -156,9 +156,17 @@ h1 {
 
 .genre-filter-container {
     margin-left: auto; /* Empurra o filtro para a direita */
+    position: relative; /* Necessário para posicionar a seta customizada */
 }
 
 #genre-filter {
+    /* Esconde a seta padrão do navegador */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    /* Garante que o padding não seja removido em alguns navegadores */
+    padding: 8px 30px 8px 15px; /* Aumenta o padding à direita para dar espaço à seta */
+
     padding: 8px 12px;
     border-radius: 20px;
     border: 2px solid var(--card-background);
@@ -168,6 +176,18 @@ h1 {
     cursor: pointer;
     outline: none;
     transition: border-color 0.3s;
+}
+
+/* Cria a seta customizada */
+.genre-filter-container::after {
+    content: '▼';
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    font-size: 0.8em;
+    color: var(--text-color);
+    pointer-events: none; /* Garante que a seta não interfira no clique do menu */
 }
 
 #genre-filter:focus {
