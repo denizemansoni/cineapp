@@ -149,6 +149,31 @@ h1 {
     background: var(--gradient-start);
 }
 
+/* Estilos para o Filtro de Gênero */
+.category-tabs {
+    align-items: center; /* Alinha os itens verticalmente */
+}
+
+.genre-filter-container {
+    margin-left: auto; /* Empurra o filtro para a direita */
+}
+
+#genre-filter {
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 2px solid var(--card-background);
+    background-color: var(--background-color);
+    color: var(--text-color);
+    font-size: 0.9rem;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+#genre-filter:focus {
+    border-color: var(--gradient-start);
+}
+
 /* Grid de filmes */
 .movies-grid {
     display: grid;

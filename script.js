@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const themeToggle = document.getElementById('checkbox');
     const homeLink = document.getElementById('home-link');
     const loader = document.getElementById('loader-overlay');
+    const genreFilter = document.getElementById('genre-filter');
     const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
 
     // --- ESTADO DA APLICAÇÃO ---
@@ -21,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let currentPage = 1; // Página atual para a paginação.
     let isLoadingMore = false; // Flag para evitar múltiplas requisições.
     let currentQuery = ''; // Armazena a busca atual para paginação.
+    let currentGenre = ''; // Armazena o gênero selecionado.
 
     // Usaremos o endpoint de proxy da Vercel para a API do TMDb
     const proxyApiUrl = '/api/tmdb';
@@ -52,8 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 url = `${proxyApiUrl}?endpoint=search/movie&query=${currentQuery}&page=${currentPage}&language=pt-BR`;
                 categoryTitle.textContent = `Resultados para: "${currentQuery}"`;
+            } else if (category === 'genre') {
+                url = `${proxyApiUrl}?endpoint=discover/movie&with_genres=${currentGenre}&page=${currentPage}&language=pt-BR`;
+                // O título será atualizado pelo evento do filtro de gênero
             } else {
                 currentQuery = ''; // Limpa a query de busca se não for uma busca.
+                currentGenre = ''; // Limpa o gênero se não for uma busca por gênero.
                 url = `${proxyApiUrl}?endpoint=movie/${category}&language=pt-BR`;
                 updateCategoryTitle(category);
             }
@@ -124,6 +130,8 @@ document.addEventListener('DOMContentLoaded', () => {
         let url;
         if (currentQuery) { // Se houver uma busca ativa
             url = `${proxyApiUrl}?endpoint=search/movie&query=${currentQuery}&page=${currentPage}&language=pt-BR`;
+        } else if (currentGenre) { // Se houver um gênero ativo
+            url = `${proxyApiUrl}?endpoint=discover/movie&with_genres=${currentGenre}&page=${currentPage}&language=pt-BR`;
         } else { // Se for uma categoria normal
             url = `${proxyApiUrl}?endpoint=movie/${currentCategory}&page=${currentPage}&language=pt-BR`;
         }
@@ -261,6 +269,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tab.classList.add('active');
             currentCategory = tab.dataset.category;
             searchInput.value = ''; // Limpa a busca ao trocar de aba
+            genreFilter.value = ''; // Reseta o filtro de gênero
             fetchMovies(currentCategory);
             window.addEventListener('scroll', handleInfiniteScroll); // Reativa o scroll listener ao trocar de aba
         });
@@ -270,6 +279,7 @@ document.addEventListener('DOMContentLoaded', () => {
     homeLink.addEventListener('click', (e) => {
         e.preventDefault();
         searchInput.value = '';
+        genreFilter.value = '';
         // Reseta para a aba 'popular'
         document.querySelector('.tab-button[data-category="popular"]').click();
     });
@@ -286,6 +296,21 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggle.addEventListener('change', () => {
         localStorage.setItem('darkTheme', themeToggle.checked);
         applyTheme(themeToggle.checked);
+    });
+
+    // Filtro de Gênero
+    genreFilter.addEventListener('change', () => {
+        currentGenre = genreFilter.value;
+        if (currentGenre) {
+            // Desativa a aba ativa e atualiza o título
+            categoryTabs.forEach(t => t.classList.remove('active'));
+            const selectedGenreText = genreFilter.options[genreFilter.selectedIndex].text;
+            categoryTitle.textContent = `Gênero: ${selectedGenreText}`;
+            fetchMovies('genre');
+        } else {
+            // Se "Filtrar por Gênero" for selecionado, volta para a categoria popular
+            document.querySelector('.tab-button[data-category="popular"]').click();
+        }
     });
 
     // Rolagem Infinita
@@ -311,11 +336,29 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     });
 
+    // --- FUNÇÕES DE INICIALIZAÇÃO ---
+    // Função para buscar e popular os gêneros no filtro
+    async function populateGenres() {
+        try {
+            const url = `${proxyApiUrl}?endpoint=genre/movie/list&language=pt-BR`;
+            const response = await fetch(url);
+            const data = await response.json();
+            data.genres.forEach(genre => {
+                const option = document.createElement('option');
+                option.value = genre.id;
+                option.textContent = genre.name;
+                genreFilter.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Erro ao buscar gêneros:', error);
+        }
+    }
 
     // --- INICIALIZAÇÃO ---
     // Carrega o tema salvo
     const savedTheme = localStorage.getItem('darkTheme') === 'true';
     applyTheme(savedTheme);
+    populateGenres(); // Busca e preenche os gêneros
     // Carrega os filmes da categoria inicial
     fetchMovies(currentCategory);
 });
